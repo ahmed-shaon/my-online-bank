@@ -12,6 +12,7 @@ import CustomInput from "./CustomInput";
 import { Loader2 } from "lucide-react";
 import { authFormSchema } from "@/lib/utils";
 import { useRouter } from "next/navigation";
+import { signIn, signUp } from "@/lib/actions/user.actions";
 
 const AuthForm = ({ type }: { type: string }) => {
   const router = useRouter();
@@ -33,13 +34,18 @@ const AuthForm = ({ type }: { type: string }) => {
     try {
       setIsLoading(true);
       //Sign up with Appwrite & create plain link token
-      if (type === "sing-up") {
-        // const newUser = await signUp(data);
-        // setUser(newUser);
+      if (type === "sign-up") {
+        const newUser = await signUp(data);
+        console.log(newUser, "new user");
+        setUser(newUser);
+        //
       } else if (type === "sign-in") {
-        //   const response = await signIn({email:data.email, password:data.password})
+        const response = await signIn({
+          email: data.email,
+          password: data.password,
+        });
+        if (response) router.push("/");
       }
-      // if(response) router.push("/")
     } catch (error) {
       console.log(error);
     } finally {
@@ -77,12 +83,6 @@ const AuthForm = ({ type }: { type: string }) => {
         <>
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
-              <CustomInput
-                control={form.control}
-                name="email"
-                label="Email"
-                placeholder="Enter your email"
-              />
               {type === "sign-up" && (
                 <>
                   <div className="flex gap-4">
@@ -135,6 +135,12 @@ const AuthForm = ({ type }: { type: string }) => {
                   </div>
                 </>
               )}
+              <CustomInput
+                control={form.control}
+                name="email"
+                label="Email"
+                placeholder="Enter your email"
+              />
               <CustomInput
                 control={form.control}
                 name="password"
